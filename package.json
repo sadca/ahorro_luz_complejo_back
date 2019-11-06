@@ -15,6 +15,7 @@
     "express-fileupload": "^1.1.6-alpha.6",
     "jsonwebtoken": "^8.5.1",
     "mysql": "github:mysqljs/mysql",
+    "node-env-file": "^0.1.8",
     "nodemailer": "^6.3.1",
     "python-shell": "^1.0.8"
   },

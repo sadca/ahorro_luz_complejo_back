@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
+import { PythonShell, Options } from 'python-shell';
 const fs = require('fs');
 const path = require('path');
-import { PythonShell, Options } from 'python-shell';
 
 const router = Router();
 
@@ -10,12 +10,17 @@ router.post('/', (req, res) => {
   console.log(adjuntos);
 
   const body = req.body;
+  const tarifa = body.tarifa;
+  const p1 = body.p1;
+  const p2 = body.p2;
+  const p3 = body.p3;
   console.log(body);
   console.log(body.propietario);
   console.log(body.tarifa);
 
   // let ruta = path.resolve(__dirname, '../public/valverde.py');
-  let ruta = path.resolve(__dirname, '../public/calculo_potencias.py');
+  // let ruta = path.resolve(__dirname, '../public/calculo_potencias.py');
+  let ruta = path.resolve(__dirname, '../public/calculo_potencias_v2.py');
   // console.log(ruta);
 
   // ES0021000005611644WD
@@ -51,9 +56,9 @@ router.post('/', (req, res) => {
   });
 
   let options: Options = {
-    mode: 'json',
+    mode: 'text',
     pythonOptions: ['-u'],
-    args: [nombreArchivo, 'Segundo parámetro', 'Tercero parámetro']
+    args: [tarifa, nombreArchivo, p1, p2, p3]
   };
 
   //   mode?: 'text' | 'json' | 'binary';
