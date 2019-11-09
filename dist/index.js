@@ -7,7 +7,6 @@ const server_1 = __importDefault(require("./server/server"));
 const router_1 = __importDefault(require("./routes/router"));
 const env = require('node-env-file');
 const path = require('path');
-console.log(path.resolve(__dirname + '/.env'));
 env(path.resolve(__dirname + '/.env'));
 require('./config/config');
 const port = Number(process.env.PORT) || 0;

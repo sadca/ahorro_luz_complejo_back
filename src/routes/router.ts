@@ -20,7 +20,8 @@ router.post('/', (req, res) => {
 
   // let ruta = path.resolve(__dirname, '../public/valverde.py');
   // let ruta = path.resolve(__dirname, '../public/calculo_potencias.py');
-  let ruta = path.resolve(__dirname, '../public/calculo_potencias_v2.py');
+  // let ruta = path.resolve(__dirname, '../public/calculo_potencias_v2.py');
+  let ruta = path.resolve(__dirname, '../public/calculo_potencias_v3.py');
   // console.log(ruta);
 
   // ES0021000005611644WD
@@ -56,7 +57,7 @@ router.post('/', (req, res) => {
   });
 
   let options: Options = {
-    mode: 'text',
+    mode: 'json',
     pythonOptions: ['-u'],
     args: [tarifa, nombreArchivo, p1, p2, p3]
   };
