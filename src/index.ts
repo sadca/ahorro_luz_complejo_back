@@ -12,8 +12,8 @@ const port = Number(process.env.PORT) || 0;
 const server = Server.init(port);
 server.app.use(router);
 
-// import MySQL from './mysql/mysql';
-// MySQL.instance;
+// import fileUpload = require('express-fileupload');
+// server.app.use(fileUpload());
 
 server.start(() => {
   console.log('Servidor corriendo en el puerto', port);

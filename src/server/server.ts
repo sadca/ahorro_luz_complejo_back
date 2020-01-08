@@ -1,7 +1,9 @@
 import express = require('express');
 import bodyParser = require('body-parser');
 import fileUpload = require('express-fileupload');
-import cors = require('cors')
+import cors = require('cors');
+import timeout = require('connect-timeout');
+// import busboy = require('connect-busboy');
 
 export default class Server {
   public app: express.Application;
@@ -10,10 +12,12 @@ export default class Server {
   constructor(puerto: number) {
     this.port = puerto;
     this.app = express();
-    this.app.use(cors())
-    this.app.use(bodyParser.urlencoded({ extended: false }));
+    this.app.use(timeout('3000s'));
+    this.app.use(cors());
+    this.app.use(bodyParser.urlencoded({ extended: true }));
     this.app.use(bodyParser.json());
-    this.app.use(fileUpload({ useTempFiles: true }));
+    this.app.use(fileUpload());
+    // this.app.use(busboy());
   }
 
   static init(puerto: number) {
