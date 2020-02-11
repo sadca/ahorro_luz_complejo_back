@@ -10,7 +10,7 @@ class Server {
     constructor(puerto) {
         this.port = puerto;
         this.app = express();
-        this.app.use(timeout('3000s'));
+        this.app.use(timeout('30000s'));
         this.app.use(cors());
         this.app.use(bodyParser.urlencoded({ extended: true }));
         this.app.use(bodyParser.json());
