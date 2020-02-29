@@ -55,28 +55,35 @@ router.post('/', [mdAutentication], (req: any, res: any) => {
   const impuestoElectrico = body.impuestoElectrico;
   const descuentoPotencia = body.descuentoPotencia;
   const descuentoEnergia = body.descuentoEnergia;
+  const comparadorPrecios = body.comparadorPrecios;
+  console.log(comparadorPrecios);
 
   // Versión actual
   let ruta = '';
-  if (
-    tarifa == '6.1A' ||
-    tarifa == '6.2' ||
-    tarifa == '6.3' ||
-    tarifa == '6.4' ||
-    tarifa == '6.5'
-  ) {
-    ruta = path.resolve(__dirname, '../public/calculo_potencias_6x_v2.py');
+  if (comparadorPrecios === 'true') {
+    ruta = path.resolve(__dirname, '../public/calculo_comparador_precios.py');
   } else {
-    ruta = path.resolve(__dirname, '../public/calculo_potencias_v4.py');
-  }
+    if (
+      tarifa == '6.1A' ||
+      tarifa == '6.2' ||
+      tarifa == '6.3' ||
+      tarifa == '6.4' ||
+      tarifa == '6.5'
+    ) {
+      ruta = path.resolve(__dirname, '../public/calculo_potencias_6x_v2.py');
+    } else {
+      ruta = path.resolve(__dirname, '../public/calculo_potencias_v4.py');
+    }
 
-  if (!adjuntos || adjuntos.length === 0) {
-    res.status(400).json({
-      ok: false,
-      mensaje: 'No hay adjuntos'
-    });
-    return;
+    if (!adjuntos || adjuntos.length === 0) {
+      res.status(400).json({
+        ok: false,
+        mensaje: 'No hay adjuntos'
+      });
+      return;
+    }
   }
+  console.log(ruta);
 
   let nombreExtension = adjuntos.archivo.name.split('.');
   let nombreArchivo = nombreExtension[0];
@@ -228,6 +235,18 @@ router.post('/', [mdAutentication], (req: any, res: any) => {
         precioP5 +
         "','" +
         precioP6 +
+        "','" +
+        precioP1opt +
+        "','" +
+        precioP2opt +
+        "','" +
+        precioP3opt +
+        "','" +
+        precioP4opt +
+        "','" +
+        precioP5opt +
+        "','" +
+        precioP6opt +
         "','" +
         precioE1Actual +
         "','" +
