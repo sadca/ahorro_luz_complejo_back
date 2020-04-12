@@ -8,6 +8,53 @@ const path = require('path');
 
 const router = Router();
 
+router.get('/', (req, res) => {
+  res.json({
+    ok: true,
+  });
+});
+
+router.post('/login', (req, res) => {
+  console.log(req.body);
+  var body = req.body;
+  var password = body.pass;
+  var user = body.usuario;
+
+  if (!password || !user) {
+    res.status(400).json({
+      ok: false,
+      mensaje: 'Tiene que indicar el usuario y contraseña',
+    });
+    return;
+  }
+
+  if (user != process.env.USERAPP) {
+    res.status(401).json({
+      ok: false,
+      mensaje: 'Usuario o contraseña incorrecta',
+    });
+    return;
+  }
+
+  if (body.pass != process.env.PASS) {
+    res.status(401).json({
+      ok: false,
+      mensaje: 'Usuario o contraseña incorrecta',
+    });
+    return;
+  }
+
+  console.log(process.env.SEED);
+  var token = jwt.sign({ usuario: body.usuario }, process.env.SEED || '', {
+    expiresIn: 7200,
+  });
+
+  res.json({
+    ok: true,
+    token,
+  });
+});
+
 router.post('/', [mdAutentication], (req: any, res: any) => {
   req.setTimeout(300000);
   let adjuntos: any = req.files;
@@ -78,7 +125,7 @@ router.post('/', [mdAutentication], (req: any, res: any) => {
     if (!adjuntos || adjuntos.length === 0) {
       res.status(400).json({
         ok: false,
-        mensaje: 'No hay adjuntos'
+        mensaje: 'No hay adjuntos',
       });
       return;
     }
@@ -92,53 +139,27 @@ router.post('/', [mdAutentication], (req: any, res: any) => {
   if (extensionArchivo != 'xlsx') {
     res.status(400).json({
       ok: false,
-      message: 'Debe adjuntar un archivo con extensión .xlsx'
+      message: 'Debe adjuntar un archivo con extensión .xlsx',
     });
     return;
   }
 
-  adjuntos.archivo.mv(`dist/public/${adjuntos.archivo.name}`, (err: any) => {
+  adjuntos.archivo.mv(`./public/${adjuntos.archivo.name}`, (err: any) => {
     if (err) {
       res.status(500).json({
         ok: false,
         err,
         message:
-          'El archivo no se ha podido subir correctamente, pruebe de nuevo o contacte con el administrador'
+          'El archivo no se ha podido subir correctamente, pruebe de nuevo o contacte con el administrador',
       });
       return;
     }
   });
 
-  // console.log(tarifa, nombreArchivo, p1, p2, p3, p4, p5, p6);
-  // console.log(
-  //   calculoAutomatico,
-  //   p1Calculos,
-  //   p2Calculos,
-  //   p3Calculos,
-  //   p4Calculos,
-  //   p5Calculos,
-  //   p6Calculos
-  // );
-  // console.log(precioP1, precioP2, precioP3, precioP4, precioP5, precioP6);
-  // console.log(
-  //   precioE1Actual,
-  //   precioE2Actual,
-  //   precioE3Actual,
-  //   precioE4Actual,
-  //   precioE5Actual,
-  //   precioE6Actual,
-  //   precioE1Optimizada,
-  //   precioE2Optimizada,
-  //   precioE3Optimizada,
-  //   precioE4Optimizada,
-  //   precioE5Optimizada,
-  //   precioE6Optimizada
-  // );
-
   let options: Options = {
     mode: 'json',
     pythonOptions: ['-u'],
-    // pythonPath : '/root/anaconda3/bin/python3',
+    pythonPath: '/root/anaconda3/bin/python3',
     args: [
       tarifa,
       nombreArchivo,
@@ -178,8 +199,8 @@ router.post('/', [mdAutentication], (req: any, res: any) => {
       precioP3opt,
       precioP4opt,
       precioP5opt,
-      precioP6opt
-    ]
+      precioP6opt,
+    ],
   };
 
   PythonShell.run(ruta, options, (err: any, results: any) => {
@@ -187,7 +208,7 @@ router.post('/', [mdAutentication], (req: any, res: any) => {
       console.log('Error');
       res.json({
         ok: false,
-        err
+        err,
       });
       return;
     } else {
@@ -286,7 +307,7 @@ router.post('/', [mdAutentication], (req: any, res: any) => {
       });
       res.json({
         ok: true,
-        results
+        results,
       });
       return;
     }
@@ -295,71 +316,22 @@ router.post('/', [mdAutentication], (req: any, res: any) => {
 
 router.get('/consultas', [mdAutentication], (req: any, res: any) => {
   let datos: any[] = [];
-  let query: string = 'SELECT * FROM historico_consultas';
+  let query: string =
+    'SELECT * FROM historico_consultas order by fecha_alta desc';
   MySQL.ejecutarQuery(query, (err: any, result: any) => {
     console.log('err', err);
     if (err) {
       res.json({
         ok: false,
-        err
+        err,
       });
       return;
     }
     datos = result;
     res.json({
       ok: true,
-      datos
+      datos,
     });
-  });
-});
-
-router.get('/', (req, res) => {
-  res.json({
-    ok: true
-  });
-});
-
-router.post('/login', (req, res) => {
-  console.log(req.body);
-  var body = req.body;
-  var password = body.pass;
-  var user = body.usuario;
-
-  if (!password || !user) {
-    res.status(400).json({
-      ok: false,
-      mensaje: 'Tiene que indicar el usuario y contraseña'
-    });
-    return;
-  }
-
-  if (user != process.env.USER) {
-    res.status(401).json({
-      ok: false,
-      mensaje: 'Usuario o contraseña incorrecta'
-    });
-    return;
-  }
-
-  // Encriptamos la contraseña
-  var pass = bcrypt.hashSync(process.env.PASS || '', 10);
-
-  if (!bcrypt.compareSync(body.pass, pass)) {
-    res.status(401).json({
-      ok: false,
-      mensaje: 'Usuario o contraseña incorrecta'
-    });
-    return;
-  }
-
-  console.log(process.env.SEED);
-  var token = jwt.sign({ usuario: body.usuario }, process.env.SEED || '', {
-    expiresIn: 7200
-  });
-
-  res.json({
-    ok: true,
-    token
   });
 });
 
@@ -375,14 +347,160 @@ router.delete('/consulta/:id', [mdAutentication], (req: any, res: any) => {
     if (err) {
       res.json({
         ok: false,
-        err
+        err,
       });
       return;
     }
     datos = result;
     res.json({
       ok: true,
-      datos
+      datos,
+    });
+  });
+});
+
+router.post('/gas', [mdAutentication], (req: any, res: any) => {
+  req.setTimeout(300000);
+  const body = req.body;
+  const propietario = body.propietario;
+  const tarifa = body.tarifa;
+  const terFijoAct = body.terFijoAct;
+  const terEnerAct = body.terEnerAct;
+  const terFijoNew = body.terFijoNew;
+  const terEnerNew = body.terEnerNew;
+  const impuesto = body.impuesto;
+  const descuento = body.descuento;
+
+  let ruta = path.resolve(__dirname, '../public/calculo_gas.py');
+
+  let adjuntos: any = req.files;
+  if (!adjuntos || adjuntos.length === 0) {
+    res.status(400).json({
+      ok: false,
+      mensaje: 'No hay adjuntos',
+    });
+    return;
+  }
+
+  let nombreExtension = adjuntos.archivo.name.split('.');
+  let nombreArchivo = nombreExtension[0];
+  let extensionArchivo = nombreExtension[1];
+
+  if (extensionArchivo != 'xlsx') {
+    res.status(400).json({
+      ok: false,
+      message: 'Debe adjuntar un archivo con extensión .xlsx',
+    });
+    return;
+  }
+
+  adjuntos.archivo.mv(`./public/${adjuntos.archivo.name}`, (err: any) => {
+    if (err) {
+      return res.status(500).json({
+        ok: false,
+        err,
+        message:
+          'El archivo no se ha podido subir correctamente, pruebe de nuevo o contacte con el administrador',
+      });
+    }
+  });
+
+  let options: Options = {
+    mode: 'json',
+    pythonOptions: ['-u'],
+    pythonPath: '/root/anaconda3/bin/python3',
+    args: [
+      tarifa,
+      nombreArchivo,
+      terFijoAct,
+      terEnerAct,
+      terFijoNew,
+      terEnerNew,
+    ],
+  };
+
+  PythonShell.run(ruta, options, (err: any, results: any) => {
+    if (err) {
+      console.log('Error');
+      return res.json({
+        ok: false,
+        err,
+      });
+    } else {
+      console.log('Ok');
+      let query: string =
+        "INSERT INTO `historico_consultas_gas` VALUES('" +
+        propietario +
+        "','" +
+        tarifa +
+        "','" +
+        terFijoAct +
+        "','" +
+        terEnerAct +
+        "','" +
+        terFijoNew +
+        "','" +
+        terEnerNew +
+        "','" +
+        impuesto +
+        "','" +
+        descuento +
+        "','" +
+        nombreArchivo +
+        "', CURRENT_TIMESTAMP)";
+      MySQL.ejecutarQuery(query, (err: any, result: any) => {
+        console.log('err', err);
+        console.log('result', result);
+      });
+      return res.json({
+        ok: true,
+        results,
+      });
+    }
+  });
+});
+
+router.get('/consultasgas', [mdAutentication], (req: any, res: any) => {
+  let datos: any[] = [];
+  let query: string =
+    'SELECT * FROM historico_consultas_gas order by fecha_alta desc';
+  MySQL.ejecutarQuery(query, (err: any, result: any) => {
+    console.log('err', err);
+    if (err) {
+      res.json({
+        ok: false,
+        err,
+      });
+      return;
+    }
+    datos = result;
+    res.json({
+      ok: true,
+      datos,
+    });
+  });
+});
+
+router.delete('/consultagas/:id', [mdAutentication], (req: any, res: any) => {
+  var id = req.params.id;
+  let datos: any[] = [];
+  let query: string =
+    'DELETE FROM historico_consultas_gas WHERE DATE_FORMAT(fecha_alta,"%Y-%m-%d %H:%i:%S") = DATE_FORMAT("' +
+    id +
+    '","%Y-%m-%d %H:%i:%S")';
+  MySQL.ejecutarQuery(query, (err: any, result: any) => {
+    console.log('err', err);
+    if (err) {
+      res.json({
+        ok: false,
+        err,
+      });
+      return;
+    }
+    datos = result;
+    res.json({
+      ok: true,
+      datos,
     });
   });
 });

@@ -7,10 +7,9 @@ class MySQL {
         console.log('Clase inicializada');
         this.conection = mysql.createConnection({
             host: 'localhost',
-            user: 'grout',
-            password: 'grout',
-            // password: 'Alftech1!',
-            database: 'sadca'
+            user: process.env.USERBBDD,
+            password: process.env.PASSBBDD,
+            database: process.env.BBDD
         });
         this.conectarDB();
     }
