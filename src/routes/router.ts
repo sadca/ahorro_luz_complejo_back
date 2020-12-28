@@ -1,8 +1,7 @@
-import { Router, Request, Response } from 'express';
+import { Router } from 'express';
 import { PythonShell, Options } from 'python-shell';
 import MySQL from '../mysql/mysql';
 import mdAutentication from '../middleware/autenticacion';
-import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 const path = require('path');
 
@@ -63,52 +62,74 @@ router.post('/', [mdAutentication], (req: any, res: any) => {
   const propietario = body.propietario;
   const tarifa = body.tarifa;
   const calculoAutomatico = body.calculoAutomatico;
-  const p1 = body.p1;
-  const p2 = body.p2;
-  const p3 = body.p3;
-  const p4 = body.p4;
-  const p5 = body.p5;
-  const p6 = body.p6;
-  const p1Calculos = body.p1Calculos;
-  const p2Calculos = body.p2Calculos;
-  const p3Calculos = body.p3Calculos;
-  const p4Calculos = body.p4Calculos;
-  const p5Calculos = body.p5Calculos;
-  const p6Calculos = body.p6Calculos;
-  const precioP1 = body.precioP1;
-  const precioP2 = body.precioP2;
-  const precioP3 = body.precioP3;
-  const precioP4 = body.precioP4;
-  const precioP5 = body.precioP5;
-  const precioP6 = body.precioP6;
-  const precioP1opt = body.precioP1opt;
-  const precioP2opt = body.precioP2opt;
-  const precioP3opt = body.precioP3opt;
-  const precioP4opt = body.precioP4opt;
-  const precioP5opt = body.precioP5opt;
-  const precioP6opt = body.precioP6opt;
-  const precioE1Actual = body.precioE1Actual;
-  const precioE2Actual = body.precioE2Actual;
-  const precioE3Actual = body.precioE3Actual;
-  const precioE4Actual = body.precioE4Actual;
-  const precioE5Actual = body.precioE5Actual;
-  const precioE6Actual = body.precioE6Actual;
-  const precioE1Optimizada = body.precioE1Optimizada;
-  const precioE2Optimizada = body.precioE2Optimizada;
-  const precioE3Optimizada = body.precioE3Optimizada;
-  const precioE4Optimizada = body.precioE4Optimizada;
-  const precioE5Optimizada = body.precioE5Optimizada;
-  const precioE6Optimizada = body.precioE6Optimizada;
-  const impuestoElectrico = body.impuestoElectrico;
-  const descuentoPotencia = body.descuentoPotencia;
-  const descuentoEnergia = body.descuentoEnergia;
+  const p1 = tratarNulos(body.p1);
+  const p2 = tratarNulos(body.p2);
+  const p3 = tratarNulos(body.p3);
+  const p4 = tratarNulos(body.p4);
+  const p5 = tratarNulos(body.p5);
+  const p6 = tratarNulos(body.p6);
+  const p1Opt = tratarNulos(body.p1Opt);
+  const p2Opt = tratarNulos(body.p2Opt);
+  const p3Opt = tratarNulos(body.p3Opt);
+  const p4Opt = tratarNulos(body.p4Opt);
+  const p5Opt = tratarNulos(body.p5Opt);
+  const p6Opt = tratarNulos(body.p6Opt);
+  const precioP1 = tratarNulos(body.precioP1);
+  const precioP2 = tratarNulos(body.precioP2);
+  const precioP3 = tratarNulos(body.precioP3);
+  const precioP4 = tratarNulos(body.precioP4);
+  const precioP5 = tratarNulos(body.precioP5);
+  const precioP6 = tratarNulos(body.precioP6);
+  const precioP1opt = tratarNulos(body.precioP1opt);
+  const precioP2opt = tratarNulos(body.precioP2opt);
+  const precioP3opt = tratarNulos(body.precioP3opt);
+  const precioP4opt = tratarNulos(body.precioP4opt);
+  const precioP5opt = tratarNulos(body.precioP5opt);
+  const precioP6opt = tratarNulos(body.precioP6opt);
+  const precioE1Actual = tratarNulos(body.precioE1Actual);
+  const precioE2Actual = tratarNulos(body.precioE2Actual);
+  const precioE3Actual = tratarNulos(body.precioE3Actual);
+  const precioE4Actual = tratarNulos(body.precioE4Actual);
+  const precioE5Actual = tratarNulos(body.precioE5Actual);
+  const precioE6Actual = tratarNulos(body.precioE6Actual);
+  const precioE1Optimizada = tratarNulos(body.precioE1Optimizada);
+  const precioE2Optimizada = tratarNulos(body.precioE2Optimizada);
+  const precioE3Optimizada = tratarNulos(body.precioE3Optimizada);
+  const precioE4Optimizada = tratarNulos(body.precioE4Optimizada);
+  const precioE5Optimizada = tratarNulos(body.precioE5Optimizada);
+  const precioE6Optimizada = tratarNulos(body.precioE6Optimizada);
+  const impuestoElectrico = tratarNulos(body.impuestoElectrico);
+  const descuentoGeneral = tratarNulos(body.descuentoGeneral);
+  const descuentoEnergia = tratarNulos(body.descuentoEnergia);
+  const descuentoPotencia = tratarNulos(body.descuentoPotencia);
+  const descuentoGeneralOpt = tratarNulos(body.descuentoGeneralOpt);
+  const descuentoPotenciaOpt = tratarNulos(body.descuentoPotenciaOpt);
+  const descuentoEnergiaOpt = tratarNulos(body.descuentoEnergiaOpt);
   const comparadorPrecios = body.comparadorPrecios;
-  console.log(comparadorPrecios);
+  const fijoIndexado = body.fijoIndexado;
+  const tarifaOptimizada = body.tarifaOptimizada;
+  const fijoIndexadoOptimizada = body.fijoIndexadoOptimizada;
+  const preMensPlanaAct = tratarNulos(body.preMensPlanaAct);
+  const penalizacionAct = tratarNulos(body.penalizacionAct);
+  const inicioPenalizacionAct = tratarNulos(body.inicioPenalizacionAct);
+  const preMensPlanaOpt = tratarNulos(body.preMensPlanaOpt);
+  const penalizacionOpt = tratarNulos(body.penalizacionOpt);
+  const inicioPenalizacionOpt = tratarNulos(body.inicioPenalizacionOpt);
+  const formulaIndexadoActual = body.formulaIndexadoActual;
+  const formulaIndexadoOptim = body.formulaIndexadoOptim;
+  const fee = tratarNulos(body.fee);
+  const feeOpt = tratarNulos(body.feeOpt);
+  const observaciones = tratarNulos(body.observaciones);
+  const conceptoDescuento = tratarNulos(body.conceptoDescuento);
+  const conceptoDescuentoOpt = tratarNulos(body.conceptoDescuentoOpt);
 
   // Versión actual
   let ruta = '';
   if (comparadorPrecios === 'true') {
-    ruta = path.resolve(__dirname, '../public/calculo_comparador_precios.py');
+    ruta = path.resolve(
+      __dirname,
+      '../public/calculo_comparador_precios_v2.py'
+    );
   } else {
     if (
       tarifa == '6.1A' ||
@@ -144,7 +165,8 @@ router.post('/', [mdAutentication], (req: any, res: any) => {
     return;
   }
 
-  adjuntos.archivo.mv(`./public/${adjuntos.archivo.name}`, (err: any) => {
+  // adjuntos.archivo.mv(`./public/${adjuntos.archivo.name}`, (err: any) => {
+  adjuntos.archivo.mv(`dist/public/${adjuntos.archivo.name}`, (err: any) => {
     if (err) {
       res.status(500).json({
         ok: false,
@@ -159,7 +181,7 @@ router.post('/', [mdAutentication], (req: any, res: any) => {
   let options: Options = {
     mode: 'json',
     pythonOptions: ['-u'],
-    pythonPath: '/root/anaconda3/bin/python3',
+    // pythonPath: '/root/anaconda3/bin/python3',
     args: [
       tarifa,
       nombreArchivo,
@@ -170,12 +192,12 @@ router.post('/', [mdAutentication], (req: any, res: any) => {
       p5,
       p6,
       calculoAutomatico,
-      p1Calculos,
-      p2Calculos,
-      p3Calculos,
-      p4Calculos,
-      p5Calculos,
-      p6Calculos,
+      p1Opt,
+      p2Opt,
+      p3Opt,
+      p4Opt,
+      p5Opt,
+      p6Opt,
       precioP1,
       precioP2,
       precioP3,
@@ -200,20 +222,30 @@ router.post('/', [mdAutentication], (req: any, res: any) => {
       precioP4opt,
       precioP5opt,
       precioP6opt,
+      fijoIndexado,
+      tarifaOptimizada,
+      fijoIndexadoOptimizada,
+      preMensPlanaAct,
+      penalizacionAct,
+      inicioPenalizacionAct,
+      preMensPlanaOpt,
+      penalizacionOpt,
+      inicioPenalizacionOpt,
+      formulaIndexadoActual,
+      formulaIndexadoOptim,
+      fee,
+      feeOpt,
+      impuestoElectrico,
+      descuentoGeneral,
+      descuentoPotencia,
+      descuentoEnergia,
+      descuentoGeneralOpt,
+      descuentoPotenciaOpt,
+      descuentoEnergiaOpt,
     ],
   };
 
-  PythonShell.run(ruta, options, (err: any, results: any) => {
-    if (err) {
-      console.log('Error');
-      res.json({
-        ok: false,
-        err,
-      });
-      return;
-    } else {
-      console.log('Ok');
-      let query: string =
+  let query: string =
         "INSERT INTO `historico_consultas` VALUES('" +
         propietario +
         "','" +
@@ -231,17 +263,17 @@ router.post('/', [mdAutentication], (req: any, res: any) => {
         "','" +
         p6 +
         "','" +
-        p1Calculos +
+        p1Opt +
         "','" +
-        p2Calculos +
+        p2Opt +
         "','" +
-        p3Calculos +
+        p3Opt +
         "','" +
-        p4Calculos +
+        p4Opt +
         "','" +
-        p5Calculos +
+        p5Opt +
         "','" +
-        p6Calculos +
+        p6Opt +
         "','" +
         calculoAutomatico +
         "','" +
@@ -300,11 +332,57 @@ router.post('/', [mdAutentication], (req: any, res: any) => {
         descuentoEnergia +
         "','" +
         nombreArchivo +
-        "', CURRENT_TIMESTAMP)";
+        "', CURRENT_TIMESTAMP, '" +
+        tarifaOptimizada +
+        "','" +
+        fijoIndexado +
+        "','" +
+        fijoIndexadoOptimizada +
+        "','" +
+        observaciones +
+        "','" +
+        descuentoGeneral +
+        "','" +
+        descuentoGeneralOpt +
+        "','" +
+        descuentoPotenciaOpt +
+        "','" +
+        descuentoEnergiaOpt +
+        "','" +
+        conceptoDescuento +
+        "','" +
+        conceptoDescuentoOpt +
+        "','" +
+        0 +
+        "','" +
+        preMensPlanaAct +
+        "','" +
+        penalizacionAct +
+        "','" +
+        inicioPenalizacionAct +
+        "','" +
+        preMensPlanaOpt +
+        "','" +
+        penalizacionOpt +
+        "','" +
+        inicioPenalizacionOpt +
+        "')";
       MySQL.ejecutarQuery(query, (err: any, result: any) => {
         console.log('err', err);
         console.log('result', result);
       });
+
+  PythonShell.run(ruta, options, (err: any, results: any) => {
+    if (err) {
+      console.log('Error', err);
+      res.json({
+        ok: false,
+        err,
+      });
+      return;
+    } else {
+      console.log('Ok');
+      
       res.json({
         ok: true,
         results,
@@ -504,5 +582,18 @@ router.delete('/consultagas/:id', [mdAutentication], (req: any, res: any) => {
     });
   });
 });
+
+function tratarNulos(valor: any) {
+  if (
+    valor == undefined ||
+    valor == 'undefined' ||
+    valor == 'null' ||
+    valor == null
+  ) {
+    return 0;
+  } else {
+    return valor;
+  }
+}
 
 export default router;

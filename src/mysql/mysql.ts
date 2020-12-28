@@ -9,7 +9,7 @@ export default class MySQL {
     console.log('Clase inicializada');
 
     this.conection = mysql.createConnection({
-      host: 'localhost',
+      host: 'www.sadca.es',
       user: process.env.USERBBDD,
       password: process.env.PASSBBDD,
       database: process.env.BBDD
